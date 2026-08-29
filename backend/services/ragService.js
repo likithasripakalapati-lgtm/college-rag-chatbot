@@ -3,17 +3,23 @@ const { generateEmbedding } = require('./embeddingService');
 const { semanticSearch } = require('./searchService');
 const Document = require('../models/Document');
 
-// Initialize Gemini API
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-  throw new Error('GEMINI_API_KEY environment variable is not set');
-}
-
-const genAI = new GoogleGenerativeAI(apiKey);
-
 // Configuration
 const CHAT_MODEL = 'gemini-3.5-flash-lite';
 const TOP_K_CHUNKS = 5;
+
+// Lazy-load Gemini API client
+let genAI = null;
+
+const getGenAI = () => {
+  if (!genAI) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error('GEMINI_API_KEY environment variable is not set');
+    }
+    genAI = new GoogleGenerativeAI(apiKey);
+  }
+  return genAI;
+};
 
 /**
  * Build context string from retrieved chunks
@@ -68,7 +74,8 @@ Do NOT include source names, chunk numbers, citations, or match percentages in t
     const userMessage = `Context from college documents:\n\n${context}\n\nQuestion: ${question}`;
 
     // Generate answer using Gemini
-    const model = genAI.getGenerativeModel({ model: CHAT_MODEL });
+    const client = getGenAI();
+    const model = client.getGenerativeModel({ model: CHAT_MODEL });
 
     const chat = model.startChat({
       history: [

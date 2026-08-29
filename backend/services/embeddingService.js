@@ -1,17 +1,23 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const Chunk = require('../models/Chunk');
 
-// Initialize Gemini API
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-  throw new Error('GEMINI_API_KEY environment variable is not set');
-}
-
-const genAI = new GoogleGenerativeAI(apiKey);
-
 // Embedding model
 const EMBEDDING_MODEL = 'gemini-embedding-001';
 
+// Lazy-load Gemini API client
+let genAI = null;
+
+const getGenAI = () => {
+  if (!genAI) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error('GEMINI_API_KEY environment variable is not set');
+    }
+    genAI = new GoogleGenerativeAI(apiKey);
+  }
+  return genAI;
+};
+ 
 /**
  * Generate embedding for a text chunk
  * @param {string} text - The text to embed
@@ -19,7 +25,8 @@ const EMBEDDING_MODEL = 'gemini-embedding-001';
  */
 const generateEmbedding = async (text) => {
   try {
-    const model = genAI.getGenerativeModel({ model: EMBEDDING_MODEL });
+    const client = getGenAI();
+    const model = client.getGenerativeModel({ model: EMBEDDING_MODEL });
     
     const result = await model.embedContent(text);
     const embedding = result.embedding.values;

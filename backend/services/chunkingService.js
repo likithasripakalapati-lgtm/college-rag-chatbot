@@ -82,8 +82,10 @@ const createChunks = async (documentId, extractedText) => {
     await Chunk.deleteMany({ documentId });
 
     // Split text into chunks
-    console.log('Extracted text length:', extractedText ? extractedText.length : 0);
-console.log('Extracted text preview:', extractedText ? extractedText.substring(0, 200) : 'EMPTY');
+    console.log('Extracted text length:', extractedText ?
+         extractedText.length : 0);
+console.log('Extracted text preview:', extractedText ?
+     extractedText.substring(0, 200) : 'EMPTY');
 
 const textChunks = chunkText(extractedText);
 

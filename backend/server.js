@@ -4,6 +4,29 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
 
+// Validate required environment variables
+const validateEnvironment = () => {
+  const requiredVars = ['MONGODB_URI', 'GEMINI_API_KEY'];
+  const missing = [];
+
+  for (const varName of requiredVars) {
+    if (!process.env[varName]) {
+      missing.push(varName);
+    }
+  }
+
+  if (missing.length > 0) {
+    console.error('❌ Missing required environment variables:', missing.join(', '));
+    console.error('Please set these variables in your Render Environment settings.');
+    process.exit(1);
+  }
+
+  console.log('✓ All required environment variables are set');
+};
+
+// Validate environment before importing routes
+validateEnvironment();
+
 const app = express();
 
 // Import routes

@@ -1,142 +1,203 @@
 'use client';
 
-import Header from '@/components/Header';
+import { useState, useEffect } from 'react';
 import ChatInterface from '@/components/ChatInterface';
 import DocumentUpload from '@/components/DocumentUpload';
-import { useState, useEffect } from 'react';
 import { checkHealth } from '@/lib/api';
 
 export default function Home() {
-  const [backendConnected, setBackendConnected] = useState(false);
-  const [checkingBackend, setCheckingBackend] = useState(true);
+const [backendConnected, setBackendConnected] = useState(false);
+const [checkingBackend, setCheckingBackend] = useState(true);
+const [activeTab, setActiveTab] = useState<'chat' | 'knowledge'>('chat');
+const [chatKey, setChatKey] = useState(0);
 
-  useEffect(() => {
-    const checkBackend = async () => {
-      const connected = await checkHealth();
-      setBackendConnected(connected);
-      setCheckingBackend(false);
-    };
+useEffect(() => {
+const checkBackend = async () => {
+const connected = await checkHealth();
 
-    checkBackend();
-    // Re-check every 10 seconds
-    const interval = setInterval(checkBackend, 10000);
-    return () => clearInterval(interval);
-  }, []);
+  setBackendConnected(connected);
+  setCheckingBackend(false);
+};
 
-  return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      <Header />
+checkBackend();
 
-      {/* Connection Status Banner */}
-      {!checkingBackend && !backendConnected && (
-        <div className="bg-yellow-50 border-b border-yellow-200">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-            <p className="text-sm text-yellow-800">
-              ⚠️ <strong>Backend not connected</strong> - Make sure the server is running at http://localhost:5000
-            </p>
-          </div>
+const interval = setInterval(checkBackend, 10000);
+
+return () => clearInterval(interval);
+
+}, []);
+
+const handleNewChat = () => {
+setChatKey((prev) => prev + 1);
+setActiveTab('chat');
+};
+
+return (
+<div className="flex h-screen bg-white overflow-hidden">
+
+  {/* Sidebar */}
+  <aside className="hidden md:flex w-72 flex-col bg-gray-50 border-r border-gray-200 p-3">
+
+    {/* Logo */}
+    <div className="flex items-center gap-3 px-3 py-4 mb-4">
+      <div className="w-9 h-9 bg-black rounded-lg flex items-center justify-center">
+        <span className="text-white font-bold text-sm">
+          AI
+        </span>
+      </div>
+
+      <div>
+        <h1 className="font-semibold text-gray-900">
+          CollegeAI
+        </h1>
+
+        <p className="text-xs text-gray-500">
+          College Assistant
+        </p>
+      </div>
+    </div>
+
+    {/* New Chat */}
+    <button
+      onClick={handleNewChat}
+      className="w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-300 bg-white hover:bg-gray-100 transition text-sm font-medium text-gray-800 mb-3"
+    >
+      <span className="text-lg">＋</span>
+      New Chat
+    </button>
+
+    {/* Navigation */}
+    <div className="space-y-1">
+
+      <button
+        onClick={() => setActiveTab('chat')}
+        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition ${
+          activeTab === 'chat'
+            ? 'bg-gray-200 text-gray-900 font-medium'
+            : 'text-gray-600 hover:bg-gray-200'
+        }`}
+      >
+        💬 Chat
+      </button>
+
+      <button
+        onClick={() => setActiveTab('knowledge')}
+        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition ${
+          activeTab === 'knowledge'
+            ? 'bg-gray-200 text-gray-900 font-medium'
+            : 'text-gray-600 hover:bg-gray-200'
+        }`}
+      >
+        📚 Knowledge Base
+      </button>
+
+    </div>
+
+    {/* Bottom Status */}
+    <div className="mt-auto border-t border-gray-200 pt-4">
+
+      <div className="flex items-center gap-2 px-3 py-2 text-xs text-gray-500">
+
+        {checkingBackend ? (
+          <>
+            <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></span>
+            Connecting...
+          </>
+        ) : backendConnected ? (
+          <>
+            <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+            AI System Online
+          </>
+        ) : (
+          <>
+            <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+            Backend Offline
+          </>
+        )}
+
+      </div>
+
+      <p className="px-3 pb-2 text-xs text-gray-400">
+        CollegeAI • 2026
+      </p>
+
+    </div>
+
+  </aside>
+
+  {/* Main Area */}
+  <main className="flex-1 flex flex-col min-w-0 bg-white">
+
+    {/* Mobile Header */}
+    <div className="md:hidden h-16 border-b border-gray-200 flex items-center justify-between px-4">
+
+      <div className="flex items-center gap-2">
+
+        <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+          <span className="text-white text-xs font-bold">
+            AI
+          </span>
         </div>
-      )}
 
-      {backendConnected && (
-        <div className="bg-green-50 border-b border-green-200">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-            <p className="text-xs text-green-700">✓ Backend connected</p>
-          </div>
+        <span className="font-semibold text-gray-900">
+          CollegeAI
+        </span>
+
+      </div>
+
+      <button
+        onClick={() =>
+          setActiveTab(
+            activeTab === 'chat' ? 'knowledge' : 'chat'
+          )
+        }
+        className="text-sm px-3 py-2 rounded-lg bg-gray-100 text-gray-700"
+      >
+        {activeTab === 'chat' ? '📚 Docs' : '💬 Chat'}
+      </button>
+
+    </div>
+
+    {/* Content */}
+    <div className="flex-1 min-h-0">
+
+      {activeTab === 'chat' ? (
+
+        <div className="h-full">
+          <ChatInterface key={chatKey} />
         </div>
-      )}
 
-      {/* Main Content */}
-      <main className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Chat (2/3 width on desktop) */}
-          <div className="lg:col-span-2">
-            <ChatInterface />
-          </div>
+      ) : (
 
-          {/* Right Column - Admin Section (1/3 width on desktop) */}
-          <div className="lg:col-span-1 space-y-6">
+        <div className="h-full overflow-y-auto bg-gray-50 p-4 sm:p-8">
+
+          <div className="max-w-2xl mx-auto">
+
+            <div className="mb-6">
+
+              <h2 className="text-2xl font-semibold text-gray-900">
+                Knowledge Base
+              </h2>
+
+              <p className="text-sm text-gray-500 mt-2">
+                Upload documents to help CollegeAI answer questions accurately.
+              </p>
+
+            </div>
+
             <DocumentUpload />
 
-            {/* Quick Info Card */}
-            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">ℹ️ How It Works</h3>
-              <ol className="space-y-3 text-sm text-gray-700">
-                <li className="flex gap-3">
-                  <span className="font-bold text-blue-600 flex-shrink-0">1</span>
-                  <span>Upload a PDF document about your college</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="font-bold text-blue-600 flex-shrink-0">2</span>
-                  <span>Backend extracts, chunks, and embeds the text</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="font-bold text-blue-600 flex-shrink-0">3</span>
-                  <span>Ask a question in the chat interface</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="font-bold text-blue-600 flex-shrink-0">4</span>
-                  <span>AI searches and returns relevant information</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="font-bold text-blue-600 flex-shrink-0">5</span>
-                  <span>Sources are displayed with each answer</span>
-                </li>
-              </ol>
-            </div>
+          </div>
 
-            {/* Tech Stack Card */}
-            <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
-              <h3 className="text-sm font-bold text-blue-900 mb-3">🚀 Technology</h3>
-              <div className="space-y-1 text-xs text-blue-800">
-                <p>• Next.js + React Frontend</p>
-                <p>• Node.js + Express Backend</p>
-                <p>• MongoDB Database</p>
-                <p>• Google Gemini AI</p>
-                <p>• Semantic Search</p>
-                <p>• RAG Pipeline</p>
-              </div>
-            </div>
-          </div>
         </div>
-      </main>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-12">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-8">
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-2">Product</h4>
-              <ul className="space-y-1 text-sm text-gray-600">
-                <li><a href="#" className="hover:text-blue-600">Chat</a></li>
-                <li><a href="#" className="hover:text-blue-600">Upload Docs</a></li>
-                <li><a href="#" className="hover:text-blue-600">Search</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-2">About</h4>
-              <ul className="space-y-1 text-sm text-gray-600">
-                <li><a href="#" className="hover:text-blue-600">Features</a></li>
-                <li><a href="#" className="hover:text-blue-600">Technology</a></li>
-                <li><a href="#" className="hover:text-blue-600">Documentation</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-2">Support</h4>
-              <ul className="space-y-1 text-sm text-gray-600">
-                <li><a href="#" className="hover:text-blue-600">Help Center</a></li>
-                <li><a href="#" className="hover:text-blue-600">Contact</a></li>
-                <li><a href="#" className="hover:text-blue-600">Feedback</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-200 pt-8">
-            <p className="text-sm text-gray-600 text-center">
-              © 2026 CollegeAI. All rights reserved. | Built with Next.js, React, and Google Gemini
-            </p>
-          </div>
-        </div>
-      </footer>
+      )}
+
     </div>
-  );
+
+  </main>
+
+</div>
+
+);
 }

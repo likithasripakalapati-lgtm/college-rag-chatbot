@@ -175,7 +175,8 @@ return (
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-black"
+              style={{ color: '#000000', opacity: 1 }}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg !text-black placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-black"
             />
 
           </div>
@@ -194,7 +195,7 @@ return (
               placeholder="Enter your password"
               required
               minLength={6}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-black"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg  !text-black placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-black"
             />
 
           </div>

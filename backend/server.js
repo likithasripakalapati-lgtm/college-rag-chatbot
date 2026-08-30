@@ -6,7 +6,7 @@ const path = require('path');
 
 // Validate required environment variables
 const validateEnvironment = () => {
-  const requiredVars = ['MONGODB_URI', 'GEMINI_API_KEY'];
+  const requiredVars = ['MONGODB_URI', 'GEMINI_API_KEY', 'JWT_SECRET'];
   const missing = [];
 
   for (const varName of requiredVars) {
@@ -32,6 +32,7 @@ const app = express();
 // Import routes
 const documentsRouter = require('./routes/documents');
 const chatRouter = require('./routes/chat');
+const authRouter = require('./routes/auth');
 
 // Middleware
 app.use(cors());
@@ -71,6 +72,9 @@ app.use('/api/documents', documentsRouter);
 
 // Chat routes (RAG pipeline)
 app.use('/api/chat', chatRouter);
+
+// Auth routes
+app.use('/api/auth', authRouter);
 
 // Server configuration
 const PORT = process.env.PORT || 5000;

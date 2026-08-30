@@ -167,5 +167,59 @@ res.status(500).json({
 
 }
 });
+router.delete('/:id', async (req, res) => {
+try {
+const document = await Document.findById(req.params.id);
 
+if (!document) {
+  return res.status(404).json({
+    success: false,
+    message: 'Document not found'
+  });
+}
+
+await Chunk.deleteMany({
+  documentId: document._id
+});
+
+await Document.findByIdAndDelete(req.params.id);
+
+res.json({
+  success: true,
+  message: 'Document deleted successfully'
+});
+
+} catch (error) {
+console.error('Error deleting document:', error.message);
+
+res.status(500).json({
+  success: false,
+  message: 'Error deleting document',
+  error: error.message
+});
+
+}
+});
+
+router.get('/', async (req, res) => {
+try {
+const documents = await Document.find()
+.sort({ createdAt: -1 });
+
+res.json({
+  success: true,
+  documents
+});
+
+} catch (error) {
+console.error('Error retrieving documents:', error.message);
+
+res.status(500).json({
+  success: false,
+  message: 'Error retrieving documents',
+  error: error.message
+});
+
+}
+});
 module.exports = router;

@@ -164,7 +164,7 @@ Live Demo
 
 Frontend:
 
-Add your deployed Vercel URL here.
+https://collegeai-six.vercel.app
 
 Backend API:
 

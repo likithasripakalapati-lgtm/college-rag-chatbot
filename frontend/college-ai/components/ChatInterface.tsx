@@ -267,7 +267,7 @@ className="flex flex-col h-full bg-white overflow-hidden"
     </form>
 
     <p className="text-center text-xs text-gray-400 mt-3">
-      CollegeAI can make mistakes. Check important information.
+      Powered by AI for smarter learning
     </p>
   </div>
 </div>
